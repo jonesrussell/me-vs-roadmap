@@ -2300,7 +2300,7 @@ namespace App\Domain\Scanning;
 use App\Entity\SkillAssessment;
 use App\Entity\SkillEvidence;
 use App\Support\Proficiency;
-use Waaseyaa\EntityStorage\EntityRepositoryInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
 final readonly class ResultPersister
 {
@@ -2399,7 +2399,7 @@ use App\Support\ScanStatus;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Waaseyaa\EntityStorage\EntityRepositoryInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
 #[CoversClass(ScanJob::class)]
 final class ScanJobTest extends TestCase
@@ -2483,7 +2483,7 @@ declare(strict_types=1);
 namespace App\Domain\Scanning;
 
 use App\Entity\Scan;
-use Waaseyaa\EntityStorage\EntityRepositoryInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 use Waaseyaa\Queue\Job;
 
 final class ScanJob extends Job
@@ -2731,7 +2731,7 @@ namespace App\Seed;
 
 use App\Entity\RoadmapPath;
 use App\Entity\RoadmapSkill;
-use Waaseyaa\EntityStorage\EntityRepositoryInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
 final readonly class RoadmapSeeder
 {
@@ -2994,7 +2994,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Waaseyaa\EntityStorage\EntityRepositoryInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
 #[AsCommand(name: 'app:seed-roadmaps', description: 'Seed the 3 MVP roadmaps with skills and detection rules')]
 final class SeedRoadmapsCommand extends Command
@@ -3119,7 +3119,7 @@ final class MeVsRoadmapProvider extends ServiceProvider
         \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher,
     ): array {
         return [
-            new SeedRoadmapsCommand($this->container->get(\Waaseyaa\EntityStorage\EntityRepositoryInterface::class)),
+            new SeedRoadmapsCommand($this->resolve(\Waaseyaa\Entity\Repository\EntityRepositoryInterface::class)),
         ];
     }
 }
@@ -3139,7 +3139,7 @@ use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Waaseyaa\EntityStorage\EntityRepositoryInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
 final readonly class AuthController
 {
@@ -3246,7 +3246,7 @@ use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Waaseyaa\EntityStorage\EntityRepositoryInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 use Waaseyaa\Queue\QueueInterface;
 
 final readonly class ScanController
@@ -3341,7 +3341,7 @@ use App\Domain\Roadmap\RollUpCalculator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Waaseyaa\EntityStorage\EntityRepositoryInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
 final readonly class ProfileController
 {
