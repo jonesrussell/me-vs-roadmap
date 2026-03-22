@@ -3113,10 +3113,13 @@ final class MeVsRoadmapProvider extends ServiceProvider
         ]));
     }
 
-    public function commands(): array
-    {
+    public function commands(
+        \Waaseyaa\Entity\EntityTypeManager $entityTypeManager,
+        \Waaseyaa\Database\DatabaseInterface $database,
+        \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher,
+    ): array {
         return [
-            SeedRoadmapsCommand::class,
+            new SeedRoadmapsCommand($this->container->get(\Waaseyaa\EntityStorage\EntityRepositoryInterface::class)),
         ];
     }
 }
@@ -3474,7 +3477,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Entity\EntityInterface;
-use Waaseyaa\User\AccountInterface;
+use Waaseyaa\Access\AccountInterface;
 
 #[CoversClass(DeveloperAccessPolicy::class)]
 final class DeveloperAccessPolicyTest extends TestCase
@@ -3532,9 +3535,9 @@ namespace App\Access;
 
 use Waaseyaa\Access\AccessPolicyInterface;
 use Waaseyaa\Access\AccessResult;
-use Waaseyaa\Access\PolicyAttribute;
+use Waaseyaa\Access\Gate\PolicyAttribute;
 use Waaseyaa\Entity\EntityInterface;
-use Waaseyaa\User\AccountInterface;
+use Waaseyaa\Access\AccountInterface;
 
 #[PolicyAttribute(entityType: 'developer')]
 final class DeveloperAccessPolicy implements AccessPolicyInterface
@@ -3556,10 +3559,23 @@ final class DeveloperAccessPolicy implements AccessPolicyInterface
             default => AccessResult::neutral(),
         };
     }
+
+    public function createAccess(string $entityTypeId, string $bundle, AccountInterface $account): AccessResult
+    {
+        return AccessResult::neutral();
+    }
 }
 ```
 
-- [ ] **Step 2: Implement ScanAccessPolicy**
+- [ ] **Step 4: Run test to verify it passes**
+
+```bash
+vendor/bin/phpunit tests/Access/DeveloperAccessPolicyTest.php
+```
+
+Expected: PASS.
+
+- [ ] **Step 5: Implement ScanAccessPolicy**
 
 ```php
 // src/Access/ScanAccessPolicy.php
@@ -3570,9 +3586,9 @@ namespace App\Access;
 
 use Waaseyaa\Access\AccessPolicyInterface;
 use Waaseyaa\Access\AccessResult;
-use Waaseyaa\Access\PolicyAttribute;
+use Waaseyaa\Access\Gate\PolicyAttribute;
 use Waaseyaa\Entity\EntityInterface;
-use Waaseyaa\User\AccountInterface;
+use Waaseyaa\Access\AccountInterface;
 
 #[PolicyAttribute(entityType: 'scan')]
 final class ScanAccessPolicy implements AccessPolicyInterface
@@ -3591,8 +3607,21 @@ final class ScanAccessPolicy implements AccessPolicyInterface
             default => AccessResult::neutral(),
         };
     }
+
+    public function createAccess(string $entityTypeId, string $bundle, AccountInterface $account): AccessResult
+    {
+        return AccessResult::forbidden();
+    }
 }
 ```
+
+- [ ] **Step 6: Run test to verify it passes**
+
+```bash
+vendor/bin/phpunit tests/Access/DeveloperAccessPolicyTest.php
+```
+
+Expected: PASS.
 
 - [ ] **Step 7: Write test for ScanAccessPolicy**
 
@@ -3609,7 +3638,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Entity\EntityInterface;
-use Waaseyaa\User\AccountInterface;
+use Waaseyaa\Access\AccountInterface;
 
 #[CoversClass(ScanAccessPolicy::class)]
 final class ScanAccessPolicyTest extends TestCase
