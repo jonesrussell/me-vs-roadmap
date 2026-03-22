@@ -35,7 +35,7 @@ A point-in-time analysis of a developer's GitHub profile.
 | `started_at` | datetime | When analysis began |
 | `completed_at` | datetime | When analysis finished |
 | `repos_analyzed` | integer | Count of repos inspected |
-| `raw_data` | JSON | Cached GitHub API responses |
+| `scan_metadata` | JSON | Summary metadata: repo list, languages detected, total files inspected. Not raw API responses — evidence details live in `SkillEvidence`. |
 
 **Relations:** Belongs to `Developer`, has many `SkillEvidence`.
 
@@ -73,8 +73,11 @@ The computed link between a developer and a skill.
 |-------|------|-------|
 | `proficiency` | enum | `none`, `beginner`, `intermediate`, `advanced` |
 | `confidence` | float | 0.0–1.0, how certain the assessment is |
+| `scan` | reference | The scan that produced this assessment |
 
-**Relations:** Belongs to `Developer`, belongs to `RoadmapSkill`, has many `SkillEvidence`.
+**Relations:** Belongs to `Developer`, belongs to `RoadmapSkill`, belongs to `Scan`, has many `SkillEvidence`.
+
+**Replacement strategy:** Each scan overwrites all `SkillAssessment` entities for that developer. Previous assessments are deleted when a new scan completes. There is no versioning — a developer's profile always reflects their latest scan.
 
 ### SkillEvidence
 
@@ -123,11 +126,16 @@ Fetch raw content only for key files (package.json, composer.json, CI configs) �
 ### Stage 4: Skill Mapping
 
 - Run detection rules from `RoadmapSkill` entities against collected evidence
-- Calculate proficiency based on:
-  - **Frequency:** How many repos show this skill
-  - **Recency:** Recent repos weighted higher than old ones
-  - **Depth:** Config/code complexity (e.g., multi-stage Dockerfile vs simple one)
-- Assign confidence score based on evidence strength
+- Calculate a raw score (0–100) per skill from three weighted signals:
+  - **Frequency (40%):** Number of repos showing this skill, normalized against total repos analyzed
+  - **Recency (30%):** Proportion of evidence from repos with commits in the last 12 months
+  - **Depth (30%):** Complexity indicators (e.g., multi-stage Dockerfile scores higher than a bare `FROM`)
+- Map raw score to proficiency:
+  - `none`: score = 0 (no evidence found)
+  - `beginner`: score 1–30
+  - `intermediate`: score 31–65
+  - `advanced`: score 66–100
+- **Confidence** = (number of evidence items for this skill) / (max evidence items seen for any skill in this scan), clamped to 0.0–1.0. Displayed as a subtle opacity/bar on the skill node — high confidence = solid, low confidence = faded. Skills with confidence < 0.3 show a "?" indicator.
 
 ### Stage 5: Persist Results
 
@@ -160,7 +168,9 @@ Rules are composable — a skill like "REST APIs" checks for HTTP framework deps
 
 ### Proficiency Roll-Up
 
-Skills form a tree. Proficiency rolls up from leaves to parents: if a developer is advanced in Docker and Kubernetes, the parent "Containerization" node shows as advanced.
+Skills form a tree. Parent proficiency is the weighted average of child raw scores (equal weights), mapped to the same proficiency thresholds. A parent node requires at least 2 children with evidence to display a rolled-up proficiency; otherwise it shows `none`.
+
+Example: if "Docker" scores 80 (advanced) and "Kubernetes" scores 40 (intermediate), their parent "Containerization" scores (80+40)/2 = 60 → intermediate.
 
 ## Roadmap Data
 
@@ -178,7 +188,7 @@ Skills form a tree. Proficiency rolls up from leaves to parents: if a developer 
 
 ### Roadmap Detection
 
-Auto-detect which roadmaps are relevant from the GitHub profile (e.g., mostly Go and Docker → Backend + DevOps). Allow the user to add/remove paths manually.
+Auto-detect which roadmaps are relevant after a scan completes. A roadmap is considered relevant if >= 3 of its leaf skills have evidence (any proficiency above `none`). All relevant roadmaps are shown by default. The developer can manually add or remove roadmaps from their profile.
 
 ## Profile & Visualization
 
@@ -204,7 +214,7 @@ When multiple roadmaps are relevant, tabs switch between roadmap trees.
 
 - **Public URL:** `/profile/{github_username}` — no auth required to view
 - **Visible data:** Profile header, skill tree, proficiency levels, evidence summaries
-- **Privacy:** Developers control visibility. Default is public. Can make profile private or hide specific roadmaps.
+- **Privacy:** Developers control visibility via the `is_public` field on `Developer`. Default is public. Per-roadmap hiding is out of scope for MVP — it's all-or-nothing.
 - **No private repo data** shown unless the developer explicitly opts in (future feature)
 
 ## Authentication
@@ -233,3 +243,4 @@ GitHub OAuth for login. The OAuth token is also used for API access during scans
 - Comparison view (developer vs developer)
 - Learning recommendations ("you should learn X next")
 - AI-powered analysis (LLM-based code understanding)
+- Per-roadmap visibility controls (hide individual roadmaps from public profile)
