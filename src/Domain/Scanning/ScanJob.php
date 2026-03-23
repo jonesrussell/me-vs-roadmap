@@ -70,9 +70,6 @@ final class ScanJob extends Job
             $this->scan->markComplete(count($selected));
             $this->repository->save($this->scan);
         } catch (\Throwable $e) {
-            $this->scan->markFailed();
-            $this->repository->save($this->scan);
-
             throw $e;
         }
     }

@@ -27,7 +27,6 @@ final class ResultPersister
     {
         // Delete existing assessments for this developer
         $existing = $this->repository->findBy([
-            'entity_type' => 'skill_assessment',
             'developer_id' => $developerId,
         ]);
 
