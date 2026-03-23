@@ -8,4 +8,4 @@ declare(strict_types=1);
  * Use this file to configure or override framework services.
  */
 
-return [];
+return [\App\Provider\MeVsRoadmapProvider::class];

@@ -41,6 +41,13 @@ return [
         'application/octet-stream',
     ],
 
+    // GitHub OAuth settings for developer authentication.
+    'github' => [
+        'client_id' => getenv('GITHUB_CLIENT_ID') ?: '',
+        'client_secret' => getenv('GITHUB_CLIENT_SECRET') ?: '',
+        'redirect_uri' => getenv('GITHUB_REDIRECT_URI') ?: 'http://localhost:8080/auth/github/callback',
+    ],
+
     // Allowed CORS origins for the admin SPA.
     'cors_origins' => ['http://localhost:3000', 'http://127.0.0.1:3000'],
 
