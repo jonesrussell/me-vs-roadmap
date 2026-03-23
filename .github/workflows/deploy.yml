@@ -21,13 +21,6 @@ jobs:
         with:
           path: app
 
-      - name: Checkout waaseyaa framework
-        uses: actions/checkout@v4
-        with:
-          repository: waaseyaa/framework
-          ref: develop/v1.1
-          path: waaseyaa
-
       - name: Set up PHP 8.4
         uses: shivammathur/setup-php@v2
         with:
@@ -70,7 +63,8 @@ jobs:
       - name: Add known host
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan roadmap.waaseyaa.org >> ~/.ssh/known_hosts
+          ssh-keyscan roadmap.waaseyaa.org >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan 147.182.150.145 >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy
         working-directory: app
