@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ developer.display_name }} — Me vs Roadmap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: #111827;
+      color: #F9FAFB;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Profile Hero */
+    .profile-hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 24px;
+      padding: 60px 24px 40px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      border: 3px solid #374151;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .profile-info {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .profile-info h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+
+    .username {
+      font-size: 0.95rem;
+      color: #6B7280;
+      margin-bottom: 8px;
+    }
+
+    .bio {
+      font-size: 0.95rem;
+      color: #9CA3AF;
+      max-width: 480px;
+    }
+
+    .roadmap-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+      padding-top: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border: 1px solid #374151;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #D1D5DB;
+      letter-spacing: 0.01em;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .badge:hover {
+      border-color: #F59E0B;
+      color: #F59E0B;
+    }
+
+    /* Skill Tree Mount */
+    #skill-tree-app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+
+    /* Noscript Fallback */
+    .roadmap-section {
+      margin-bottom: 40px;
+    }
+
+    .roadmap-section h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1F2937;
+    }
+
+    .skill-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 8px;
+    }
+
+    .skill {
+      padding: 10px 16px;
+      background: #1F2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      color: #D1D5DB;
+    }
+
+    .skill--beginner {
+      border-left: 3px solid #6B7280;
+    }
+
+    .skill--intermediate {
+      border-left: 3px solid #3B82F6;
+    }
+
+    .skill--advanced {
+      border-left: 3px solid #F59E0B;
+    }
+
+    .skill--expert {
+      border-left: 3px solid #10B981;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 40px 0;
+      border-top: 1px solid #1F2937;
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 0.8rem;
+      color: #4B5563;
+      line-height: 1.8;
+    }
+
+    .footer a {
+      color: #6B7280;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer a:hover {
+      color: #F59E0B;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .profile-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 40px 24px 32px;
+      }
+
+      .avatar {
+        width: 72px;
+        height: 72px;
+      }
+
+      .profile-info h1 {
+        font-size: 1.4rem;
+      }
+
+      .skill-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="profile">
+    <header class="profile-hero">
+      <img src="{{ developer.avatar_url }}" alt="{{ developer.display_name }}" class="avatar" />
+      <div class="profile-info">
+        <h1>{{ developer.display_name }}</h1>
+        <p class="username">@{{ developer.github_username }}</p>
+        {% if developer.bio %}
+          <p class="bio">{{ developer.bio }}</p>
+        {% endif %}
+      </div>
+      <div class="roadmap-badges">
+        {% for roadmap in roadmaps %}
+          <span class="badge">{{ roadmap.name }}</span>
+        {% endfor %}
+      </div>
+    </header>
+
+    <div id="skill-tree-app" data-profile="{{ profile_json }}">
+      <noscript>
+        {% for roadmap in roadmaps %}
+          <section class="roadmap-section">
+            <h2>{{ roadmap.name }}</h2>
+            <ul class="skill-list">
+              {% for skill in roadmap.skills %}
+                <li class="skill skill--{{ skill.proficiency }}">
+                  {{ skill.skill_name }}: {{ skill.proficiency }}
+                </li>
+              {% endfor %}
+            </ul>
+          </section>
+        {% endfor %}
+      </noscript>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p><a href="/">Me vs Roadmap</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
