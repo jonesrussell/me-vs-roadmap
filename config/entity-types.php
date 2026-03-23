@@ -19,4 +19,11 @@ declare(strict_types=1);
  *   ];
  */
 
-return [];
+return [
+    new \Waaseyaa\Entity\EntityType(id: 'developer', label: 'Developer', class: \App\Entity\Developer::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'display_name']),
+    new \Waaseyaa\Entity\EntityType(id: 'scan', label: 'Scan', class: \App\Entity\Scan::class, keys: ['id' => 'id', 'uuid' => 'uuid']),
+    new \Waaseyaa\Entity\EntityType(id: 'roadmap_path', label: 'Roadmap Path', class: \App\Entity\RoadmapPath::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name']),
+    new \Waaseyaa\Entity\EntityType(id: 'roadmap_skill', label: 'Roadmap Skill', class: \App\Entity\RoadmapSkill::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name']),
+    new \Waaseyaa\Entity\EntityType(id: 'skill_assessment', label: 'Skill Assessment', class: \App\Entity\SkillAssessment::class, keys: ['id' => 'id', 'uuid' => 'uuid']),
+    new \Waaseyaa\Entity\EntityType(id: 'skill_evidence', label: 'Skill Evidence', class: \App\Entity\SkillEvidence::class, keys: ['id' => 'id', 'uuid' => 'uuid']),
+];
